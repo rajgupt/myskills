@@ -1,12 +1,6 @@
 ---
 name: ds-planner
-description: Use when starting any data science task that involves multiple
-  stages of work where downstream choices depend on upstream findings. Triggers
-  include: "build a model", "estimate the effect of X on Y", "analyze this
-  dataset", "forecast", "detect anomalies", or any multi-step ML/stats/causal
-  workflow. Produces a role-based phased plan in plan.md with explicit
-  checkpoints and a state machine for each phase. Do NOT use for single-shot
-  queries like "plot this column" or "fit a logistic regression on this data".
+description: Use when starting any multi-step data science task where downstream choices depend on upstream findings — "build a model", "estimate the effect of X on Y", "analyze this dataset", "forecast", "detect anomalies". Do NOT use for single-shot queries like "plot this column".
 ---
 
 # Data Science Planner
@@ -129,6 +123,10 @@ Format diffs as:
 - P5 step 3: removed "calibration on full data"
              reason: superseded by per-cohort calibration in revised P5
 ```
+
+## Plan template
+
+Use `plan-template.md` (in this skill directory) as the starting structure for `plan.md`.
 
 ## When to invoke other skills
 
