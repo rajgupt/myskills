@@ -103,39 +103,30 @@ Always checkpoint at phase boundaries. Additionally, **interrupt mid-phase** if:
 
 ## Replan as diff, not rewrite
 
-When findings invalidate downstream phases, the checkpoint reviewer:
+When findings invalidate downstream phases, the checkpoint reviewer produces
+a **diff**: which phases change, what changes, why. This:
 
-1. Edits `plan.md` to reflect current state (current truth only — no history inline)
-2. Appends the rationale to `plan-changelog.md` (append-only audit trail)
-3. Commits both files together with a message like `checkpoint: P3 replan — per-cohort model`
+- Keeps the audit trail clean
+- Anchors the agent to history (prevents drift)
+- Makes the human's review job tractable (review changes, not the whole plan)
 
-This gives you free blame, rollback, and a clean audit trail via git. The changelog entry format:
+Format diffs as:
 
-```markdown
-### YYYY-MM-DD — Checkpoint after P<id>
-**Blast radius:** local | cascade | goal
-**Findings summary:**
-- <bullet>
-- <bullet>
-
-**Changes applied:**
-~ P3 (estimate): logistic regression → per-cohort XGBoost
-                 reason: P1 found 2x churn rate gap between cohorts
-+ P4.5 (audit): added promo cohort error analysis
-                reason: subgroup gap discovered in P3
-- P5 step 3: removed calibration on full data
-             reason: superseded by per-cohort calibration
-
-**Human decision:** <option chosen + any flagged concerns>
 ```
+~ P3 (estimate): was "logistic regression baseline"
+                 now "logistic regression baseline, stratified by cohort"
+                 reason: P1 found 2x churn rate gap between cohorts
 
-`plan.md` always reflects current truth. `plan-changelog.md` holds all history.
++ P4.5 (audit): added "promo cohort error analysis"
+                reason: subgroup performance gap discovered in P3
+
+- P5 step 3: removed "calibration on full data"
+             reason: superseded by per-cohort calibration in revised P5
+```
 
 ## Plan template
 
-Use `plan-template.md` as the starting structure for `plan.md`.
-Use `plan-changelog-template.md` as the starting structure for `plan-changelog.md`.
-Both files live alongside each other in the project directory.
+Use `plan-template.md` (in this skill directory) as the starting structure for `plan.md`.
 
 ## When to invoke other skills
 
@@ -147,7 +138,5 @@ Both files live alongside each other in the project directory.
 
 - Drafting all phases in full detail upfront (creates false confidence)
 - Skipping work classification ("it's ML" — but is it predictive or causal?)
-- Writing history into plan.md instead of plan-changelog.md
-- Editing plan-changelog.md retroactively (append-only)
+- Rewriting plan.md instead of producing diffs
 - Auto-advancing past AWAITING_REVIEW
-- Committing plan.md without also committing plan-changelog.md

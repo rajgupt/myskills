@@ -23,10 +23,9 @@ description: Use at the end of every executed phase, when the phase is in
    - Proposed plan diff (see format below)
    - Blast radius tag for the diff
    - Specific A/B questions for the human
-6. **Wait for human input.** Do not modify plan.md beyond appending the
-   Checkpoint Report.
-7. After human responds: apply the approved diff, append to Decision Log,
-   transition phase state to `DONE` or `(RE)PLANNED`.
+6. **Wait for human input.** Do not modify plan.md or plan-changelog.md yet.
+7. After human responds: edit plan.md to current state, append changelog entry
+   to plan-changelog.md, commit both, transition phase to `DONE` or `(RE)PLANNED`.
 
 ## Role-specific review focus
 
@@ -41,19 +40,23 @@ Match the phase's role from the planner table:
 
 ## Diff format
 
-Express plan revisions as deltas, not rewrites:
+Express plan revisions using this format — for the changelog entry, not inline in plan.md:
 
 ```
-~ P<id> (<role>): was "<old>"
-                  now "<new>"
+~ P<id> (<role>): <old description> → <new description>
                   reason: <evidence from findings>
 
-+ P<id> (<role>): added "<new phase>"
++ P<id> (<role>): added "<new phase name>"
                   reason: <evidence>
 
 - P<id> step <n>: removed "<step>"
                   reason: <evidence>
 ```
+
+**Where changes live:**
+- `plan.md` — edited to reflect current state only (no history inline)
+- `plan-changelog.md` — changelog entry appended with findings + diff above
+- Both files committed together: `git commit -m "checkpoint: P<id> replan — <one-line reason>"`
 
 ## Blast radius tagging
 
@@ -101,12 +104,14 @@ gives the human a chance to engage with evidence before committing.
 
 ## State transitions (after human responds)
 
-| Human response | Phase transition | Plan.md update |
-|---|---|---|
-| Approve as-is, no diff needed | → DONE | Append to Decision Log: "approved as-is" |
-| Approve diff | → (RE)PLANNED | Apply diff; append to Decision Log with the diff |
-| Reject; redirect with new instructions | stays in AWAITING_REVIEW | Append response; reviewer re-runs with new context |
-| Reject; revisit upstream phase | upstream phase → AWAITING_REVIEW | Append rationale; revisit upstream checkpoint |
+| Human response | Phase transition | plan.md | plan-changelog.md | git |
+|---|---|---|---|---|
+| Approve as-is | → DONE | update phase state | append entry: "approved as-is" | commit both |
+| Approve diff | → (RE)PLANNED | apply changes + update state | append entry with full diff | commit both |
+| Reject; redirect | stays in AWAITING_REVIEW | no change | append human response | no commit yet |
+| Reject; revisit upstream | upstream → AWAITING_REVIEW | update upstream state | append rationale | no commit yet |
+
+**Commit message format:** `checkpoint: P<id> <done|replan> — <one-line reason>`
 
 ## Anti-patterns
 

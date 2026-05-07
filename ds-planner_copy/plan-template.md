@@ -1,8 +1,7 @@
 # Project Plan: <project name>
 
-> Living document. Reflects current state only — no history inline.
-> Full checkpoint history (findings, diffs, decisions) lives in `plan-changelog.md`.
-> Both files committed together after every approved checkpoint.
+> Living document. Updated only via approved checkpoint diffs. Never rewrite —
+> always diff.
 
 ---
 
@@ -75,7 +74,20 @@ States: `PLANNED → IN_EXECUTION → AWAITING_REVIEW → (RE)PLANNED or DONE`
 
 ---
 
-## Decision Log
+## Decision Log (append-only)
 
-See `plan-changelog.md` for full history of checkpoint findings, diffs, and
-human decisions. This file reflects current state only.
+### YYYY-MM-DD — Initial plan
+- Work classified as <type>.
+- Phases P0–P<n> drafted with roles: <list>.
+
+### YYYY-MM-DD — Checkpoint after P<id>
+**Findings summary:** <3–5 bullets>
+
+**Diff applied** (blast radius: <local | cascade | goal>):
+```
+~ P<id> (<role>): was "..." now "..." reason: ...
++ P<id> (<role>): added "..." reason: ...
+- P<id> step <n>: removed "..." reason: ...
+```
+
+**Human decision:** <which option chosen + any flagged concerns>
