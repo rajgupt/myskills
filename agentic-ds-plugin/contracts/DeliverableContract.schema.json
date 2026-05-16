@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "DeliverableContract.schema.json",
+  "title": "DeliverableContract payload",
+  "description": "Payload schema for the `payload` field of a DeliverableContract envelope. STUB — fill in `properties` and `required` when you plan this skill. The envelope itself is validated by contract_envelope.schema.json.",
+  "type": "object",
+  "x-emitted-by": "S6",
+  "x-consumed-by": [],
+  "properties": {},
+  "required": []
+}

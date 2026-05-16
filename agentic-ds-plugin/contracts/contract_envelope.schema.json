@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "contract_envelope.schema.json",
+  "title": "Contract Envelope",
+  "description": "Uniform envelope shared by every skill contract in the plugin. The skill-specific schema goes inside `payload` and is validated separately against the matching contracts/<contract_type>.schema.json.",
+  "type": "object",
+  "required": [
+    "id",
+    "skill_name",
+    "contract_type",
+    "version",
+    "timestamp",
+    "status",
+    "iteration",
+    "payload",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique id for this contract instance."
+    },
+    "skill_name": {
+      "type": "string",
+      "enum": ["S0", "S1", "S2", "S3", "S4", "S5", "S6"],
+      "description": "Which skill emitted this contract."
+    },
+    "contract_type": {
+      "type": "string",
+      "enum": [
+        "SpecContract",
+        "DataProfileContract",
+        "EDAFindingsContract",
+        "FeatureSetContract",
+        "ModelContract",
+        "EvaluationContract",
+        "DeliverableContract"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Schema version of the payload, e.g. '1.0.0'."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Emission time, UTC ISO-8601."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["COMPLETE", "PARTIAL", "BLOCKED", "NEEDS_REVISION"]
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Which cycle of this skill produced the contract (1-indexed)."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Skill-specific contract body. Validated against contracts/<contract_type>.schema.json."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Things the skill took as given, surfaced for human/Spec-Author review."
+    },
+    "violations": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["expected", "observed", "severity"],
+        "properties": {
+          "expected": { "type": "string" },
+          "observed": { "type": "string" },
+          "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }
+        }
+      },
+      "description": "Pre-conditions that were expected but not met."
+    },
+    "open_questions": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["question", "criticality"],
+        "properties": {
+          "question": { "type": "string" },
+          "criticality": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH"] },
+          "blocks_progress": { "type": "boolean", "default": false }
+        }
+      },
+      "description": "Ambiguities surfaced by the skill that feed the feedback loop."
+    },
+    "revision_request": {
+      "type": "object",
+      "description": "Present only when status == NEEDS_REVISION. Identifies the feedback edge and justifies the loop (used for termination control).",
+      "required": ["edge", "target_skill", "reason", "changed"],
+      "properties": {
+        "edge": {
+          "type": "string",
+          "enum": ["S2->S0", "S3->S2", "S4->S3", "S5->S4", "S5->S0"]
+        },
+        "target_skill": {
+          "type": "string",
+          "enum": ["S0", "S1", "S2", "S3", "S4", "S5", "S6"]
+        },
+        "reason": { "type": "string" },
+        "changed": {
+          "type": "string",
+          "description": "What is expected to differ on the next pass (loop-termination evidence)."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["inputs_used"],
+      "properties": {
+        "inputs_used": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Contract ids consumed to produce this one."
+        },
+        "artifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths to notebooks, plots, tables, models produced."
+        },
+        "code_ref": {
+          "type": "string",
+          "description": "Commit hash / script path that generated this contract."
+        },
+        "env_hash": {
+          "type": "string",
+          "description": "Hash of the execution environment for reproducibility."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "NEEDS_REVISION" } } },
+      "then": { "required": ["revision_request"] }
+    }
+  ]
+}

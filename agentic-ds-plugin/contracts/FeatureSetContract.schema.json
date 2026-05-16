@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "FeatureSetContract.schema.json",
+  "title": "FeatureSetContract payload",
+  "description": "Payload schema for the `payload` field of a FeatureSetContract envelope. STUB — fill in `properties` and `required` when you plan this skill. The envelope itself is validated by contract_envelope.schema.json.",
+  "type": "object",
+  "x-emitted-by": "S3",
+  "x-consumed-by": ["S4"],
+  "properties": {},
+  "required": []
+}

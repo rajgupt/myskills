@@ -1,0 +1,32 @@
+# Orchestrator configuration.
+# Read by ds-checkpoint-reviewer (via orchestrator/adapter.md) to enforce
+# the inner loop-termination backstop. The OUTER control is always the
+# human gate at AWAITING_REVIEW — this config only escalates when a human
+# keeps approving the same edge past its budget.
+
+run:
+  ledger_dir: ./ledger
+  resume_from_last_complete: true   # restart from last DONE checkpoint
+
+# Per-edge iteration budgets (PLUGIN.md §4). Exceeding a budget overrides
+# an approved diff to BLOCKED and escalates — catches infinite cycles
+# (e.g. S2<->S0 ping-pong) even when a human keeps approving them.
+feedback_edges:
+  "S2->S0": { budget: 3 }
+  "S3->S2": { budget: 3 }
+  "S4->S3": { budget: 4 }
+  "S5->S4": { budget: 4 }
+  "S5->S0": { budget: 2 }
+
+# 'local' blast-radius re-runs (no named edge) get their own budget so an
+# in-skill loop can't spin forever either.
+local_rerun_budget: 3
+
+# Global backstop across all edges in one run.
+global_iteration_ceiling: 12
+
+# Defaults skills may read from SpecContract guardrails if unset there.
+defaults:
+  sampling: full          # full | sample
+  sample_rows: 1000000
+  compute_budget_minutes: 60
